@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>工作计划</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a1a;
+      font-size: 13px;
+      min-height: 100vh;
+    }
+
+    /* ══════════════════════════════════════
+       Header
+    ══════════════════════════════════════ */
+    .header {
+      background: #fff;
+      padding: 14px 24px 0;
+      border-bottom: 1px solid #e8e8e8;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .title-input {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+      border: none;
+      outline: none;
+      background: transparent;
+      min-width: 160px;
+      border-radius: 4px;
+      padding: 2px 6px;
+      transition: background 0.15s;
+    }
+    .title-input:hover, .title-input:focus { background: #f0f4ff; }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: #999;
+      padding: 3px 0 8px;
+      flex-wrap: wrap;
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #f0f4ff;
+      color: #1677ff;
+      font-weight: 500;
+      font-size: 11px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 0;
+      border-top: 1px solid #f0f0f0;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 11px;
+      border-radius: 5px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      font-size: 12px;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn:hover { background: #f5f5f5; border-color: #bbb; }
+    .btn.primary { background: #1677ff; color: #fff; border-color: #1677ff; }
+    .btn.primary:hover { background: #0958d9; }
+    .btn.success { background: #52c41a; color: #fff; border-color: #52c41a; }
+    .btn.success:hover { background: #389e0d; }
+
+    /* 快速入口 */
+    .quick-links {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: auto;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .quick-link-item {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 11px;
+      transition: box-shadow 0.15s;
+      text-decoration: none;
+    }
+    .quick-link-item:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-color: #d0d0d0;
+    }
+    .ql-label {
+      padding: 3px 7px;
+      background: #f7f8fa;
+      color: #555;
+      font-weight: 500;
+      border-right: 1px solid #e8e8e8;
+      white-space: nowrap;
+    }
+    .ql-arrow {
+      padding: 3px 6px;
+      background: #fff;
+      color: #1677ff;
+      display: flex;
+      align-items: center;
+      transition: background 0.12s;
+    }
+    .quick-link-item:hover .ql-arrow { background: #f0f4ff; }
+
+    /* ══════════════════════════════════════
+       日历区域
+    ══════════════════════════════════════ */
+    .calendar-wrap {
+      background: #fff;
+      border-bottom: 2px solid #e8e8e8;
+      padding: 10px 24px 0;
+    }
+
+    .cal-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .cal-nav {
+      width: 24px; height: 24px;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      background: #fff;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #666;
+      transition: all 0.15s;
+    }
+    .cal-nav:hover { border-color: #1677ff; color: #1677ff; background: #f0f4ff; }
+
+    .cal-month-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      min-width: 80px;
+    }
+
+    .cal-today-btn {
+      padding: 2px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      background: #fff;
+      font-size: 11px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .cal-today-btn:hover { border-color: #1677ff; color: #1677ff; }
+
+    .cal-view-toggle {
+      margin-left: auto;
+      display: flex;
+      gap: 3px;
+    }
+    .cal-view-btn {
+      padding: 2px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      background: #fff;
+      font-size: 11px;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .cal-view-btn.active { background: #1677ff; color: #fff; border-color: #1677ff; }
+
+    /* 周视图 */
+    .cal-week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+      padding-bottom: 8px;
+    }
+
+    .cal-day-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      padding: 3px 2px;
+      border-radius: 6px;
+      transition: background 0.12s;
+    }
+    .cal-day-col:hover { background: #f5f7ff; }
+
+    .cal-wd-label {
+      font-size: 10px;
+      color: #bbb;
+      font-weight: 500;
+    }
+
+    .cal-date-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+      transition: all 0.15s;
+    }
+
+    .cal-day-col.is-today .cal-date-num {
+      background: #1677ff;
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(22,119,255,0.4);
+    }
+    .cal-day-col.is-selected:not(.is-today) .cal-date-num {
+      background: #fa8c16;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(250,140,22,0.35);
+    }
+    .cal-day-col.is-weekend .cal-wd-label { color: #f5a623; }
+    .cal-day-col.is-weekend:not(.is-today):not(.is-selected) .cal-date-num { color: #f5a623; }
+    .cal-day-col.is-other-month .cal-date-num { color: #ccc; }
+
+    .cal-task-dots { display: flex; gap: 2px; min-height: 5px; }
+    .cal-dot { width: 4px; height: 4px; border-radius: 50%; }
+    .cal-dot.pending { background: #1677ff; }
+    .cal-dot.done    { background: #52c41a; }
+
+    /* 月视图 */
+    .cal-month-grid {
+      display: none;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      padding-bottom: 8px;
+    }
+    .cal-month-grid.show { display: grid; }
+
+    .cal-mth-wd {
+      text-align: center;
+      font-size: 10px;
+      color: #bbb;
+      padding: 3px 0;
+    }
+
+    .cal-mth-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 3px 1px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.12s;
+      min-height: 34px;
+    }
+    .cal-mth-cell:hover { background: #f5f7ff; }
+
+    .cal-mth-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      color: #333;
+      transition: all 0.12s;
+    }
+    .cal-mth-cell.is-today .cal-mth-num { background: #1677ff; color: #fff; font-weight: 700; }
+    .cal-mth-cell.is-selected:not(.is-today) .cal-mth-num { background: #fa8c16; color: #fff; }
+    .cal-mth-cell.is-other-month .cal-mth-num { color: #ddd; }
+    .cal-mth-cell.is-weekend:not(.is-today):not(.is-selected) .cal-mth-num { color: #f5a623; }
+
+    /* ══════════════════════════════════════
+       周计划表格
+    ══════════════════════════════════════ */
+    .main {
+      padding: 16px 24px 40px;
+      overflow-x: auto;
+    }
+
+    /* 周标题行 */
+    .week-title-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .week-range-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .week-nav-btn {
+      width: 26px; height: 26px;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      background: #fff;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #666;
+      transition: all 0.15s;
+    }
+    .week-nav-btn:hover { border-color: #1677ff; color: #1677ff; background: #f0f4ff; }
+
+    /* 表格容器 */
+    .week-table-wrap {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      overflow: hidden;
+      min-width: 700px;
+    }
+
+    .week-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    /* 表头 */
+    .week-table thead th {
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: #888;
+      background: #fafafa;
+      border-bottom: 1px solid #f0f0f0;
+      border-right: 1px solid #f0f0f0;
+      white-space: nowrap;
+    }
+    .week-table thead th:last-child { border-right: none; }
+
+    /* 序号列 */
+    .week-table th.col-seq,
+    .week-table td.col-seq {
+      width: 44px;
+      text-align: center;
+    }
+
+    /* 时间列 */
+    .week-table th.col-time,
+    .week-table td.col-time {
+      width: 52px;
+      text-align: center;
+    }
+
+    /* 日期列头 */
+    .th-date {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .th-wd {
+      font-size: 11px;
+      color: #aaa;
+      font-weight: 500;
+    }
+    .th-day {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    .th-day.is-today {
+      color: #1677ff;
+    }
+    .th-day.is-weekend {
+      color: #f5a623;
+    }
+
+    /* 表格行 */
+    .week-table tbody td {
+      padding: 10px 12px;
+      vertical-align: top;
+      border-bottom: 1px solid #f5f5f5;
+      border-right: 1px solid #f5f5f5;
+      min-height: 80px;
+    }
+    .week-table tbody td:last-child { border-right: none; }
+    .week-table tbody tr:last-child td { border-bottom: none; }
+
+    /* 序号/时间单元格 */
+    .td-seq {
+      text-align: center;
+      font-size: 13px;
+      color: #bbb;
+      font-weight: 600;
+      padding-top: 14px !important;
+    }
+
+    .td-time {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #888;
+      padding-top: 14px !important;
+      white-space: nowrap;
+    }
+    .td-time .slot-icon { font-size: 14px; display: block; margin-bottom: 2px; }
+
+    /* 任务单元格 */
+    .td-tasks {
+      min-width: 120px;
+    }
+
+    /* 今天列高亮 */
+    .week-table td.is-today-col {
+      background: #f8fbff;
+    }
+    .week-table thead th.is-today-col {
+      background: #eef4ff;
+    }
+
+    /* 周末列 */
+    .week-table td.is-weekend-col {
+      background: #fffdf5;
+    }
+    .week-table thead th.is-weekend-col {
+      background: #fffbf0;
+    }
+
+    /* ── 任务条目 ── */
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 3px 0;
+      border-radius: 4px;
+      transition: background 0.1s;
+      position: relative;
+    }
+    .task-item:hover { background: #f5f7ff; }
+    .task-item:hover .task-ops { opacity: 1; }
+
+    .task-cb {
+      flex-shrink: 0;
+      width: 14px; height: 14px;
+      margin-top: 3px;
+      cursor: pointer;
+      accent-color: #1677ff;
+    }
+
+    .task-text-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .task-text {
+      font-size: 12px;
+      line-height: 1.55;
+      color: #333;
+      outline: none;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      resize: none;
+      min-height: 18px;
+      width: 100%;
+      cursor: text;
+      word-break: break-all;
+      padding: 0;
+    }
+    .task-text:focus {
+      background: #f0f4ff;
+      border-radius: 3px;
+      padding: 1px 4px;
+    }
+
+    .task-item.is-done .task-text {
+      text-decoration: line-through;
+      color: #bbb;
+    }
+
+    .task-text.hl { color: #1677ff; font-weight: 500; }
+    .task-item.is-done .task-text.hl { color: #bbb; }
+
+    .task-done-time {
+      font-size: 10px;
+      color: #ccc;
+      display: none;
+    }
+    .task-item.is-done .task-done-time { display: block; }
+
+    .task-ops {
+      display: flex;
+      gap: 1px;
+      opacity: 0;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+
+    .task-op-btn {
+      width: 18px; height: 18px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      color: #ccc;
+      transition: all 0.1s;
+    }
+    .task-op-btn:hover { background: #eee; color: #555; }
+    .task-op-btn.del:hover { background: #fff1f0; color: #ff4d4f; }
+
+    /* 已完成分隔 */
+    .done-divider {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 4px 0 2px;
+      font-size: 10px;
+      color: #ddd;
+    }
+    .done-divider::before, .done-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #f0f0f0;
+    }
+
+    /* 添加任务按钮 */
+    .add-task-btn {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      color: #ccc;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      padding: 3px 2px;
+      border-radius: 3px;
+      transition: all 0.15s;
+      margin-top: 4px;
+    }
+    .add-task-btn:hover { color: #1677ff; background: #f0f4ff; }
+
+    /* ── 保存提示 ── */
+    .save-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #52c41a;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .save-toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── 跳转提示条 ── */
+    .jump-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: linear-gradient(90deg, #1677ff, #36cfc9);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 16px;
+      text-align: center;
+      z-index: 300;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+    .jump-bar.show { opacity: 1; transform: translateY(0); }
+
+    /* ── 响应式 ── */
+    @media (max-width: 768px) {
+      .header, .calendar-wrap { padding-left: 12px; padding-right: 12px; }
+      .main { padding: 10px 8px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── 顶部 ── -->
+<div class="header">
+  <div class="header-top">
+    <input class="title-input" id="planTitle" value="工作计划" />
+    <button class="btn primary" onclick="savePlan()">💾 保存</button>
+    <button class="btn" onclick="exportPlan()">📤 导出</button>
+    <div class="quick-links">
+      <a class="quick-link-item" href="https://km.sankuai.com/page/289064528" target="_blank">
+        <span class="ql-label">学城</span><span class="ql-arrow">↗</span>
+      </a>
+      <a class="quick-link-item" href="https://ones.sankuai.com/ones/product/21856/workItem/requirement/list?filterId=7&cn=1" target="_blank">
+        <span class="ql-label">ONES</span><span class="ql-arrow">↗</span>
+      </a>
+      <a class="quick-link-item" href="https://bi.sankuai.com/sql/edit" target="_blank">
+        <span class="ql-label">境内魔数</span><span class="ql-arrow">↗</span>
+      </a>
+      <a class="quick-link-item" href="https://bi.keetapp.com/sql/edit" target="_blank">
+        <span class="ql-label">境外魔数</span><span class="ql-arrow">↗</span>
+      </a>
+      <a class="quick-link-item" href="https://cdb-iot.meituan.com/ams/operation/device-management" target="_blank">
+        <span class="ql-label">硬件管理平台</span><span class="ql-arrow">↗</span>
+      </a>
+      <a class="quick-link-item" href="https://cdb.sankuai.com/price-web/page/orderManager/List" target="_blank">
+        <span class="ql-label">运营后台</span><span class="ql-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+  <div class="header-meta">
+    <span>📅 <span id="lastSaved">未保存</span></span>
+    <span class="stat-badge" id="statBadge">0 / 0 已完成</span>
+    <span id="todayLabel" style="color:#1677ff;font-weight:500;font-size:12px;"></span>
+    <span id="lastImportLabel" style="color:#52c41a;font-size:11px;display:none;">📥 <span id="lastImportTime"></span></span>
+  </div>
+  <div class="toolbar">
+    <button class="btn success" onclick="addTaskSlot('am')">＋ 添加上午行</button>
+    <button class="btn success" onclick="addTaskSlot('pm')">＋ 添加下午行</button>
+    <button class="btn" onclick="clearDone()">🗑 清除已完成</button>
+    <button class="btn" onclick="toggleAllGroups()">⇅ 全部展开/收起</button>
+    <button class="btn" onclick="jumpToToday()">📍 回到今天</button>
+    <button class="btn" id="importHintBtn" onclick="showImportHint()" style="color:#52c41a;border-color:#b7eb8f;">📥 日程导入</button>
+  </div>
+
+  <!-- 导入说明弹窗 -->
+  <div id="importHintModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:500;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:12px;padding:24px 28px;max-width:420px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+      <div style="font-size:15px;font-weight:700;margin-bottom:12px;">📥 大象日程自动导入</div>
+      <div style="font-size:13px;color:#555;line-height:1.8;">
+        <p>已配置 <strong>每天 8:30</strong> 自动导入当日大象日程到工作计划。</p>
+        <p style="margin-top:8px;">如需立即手动导入，在终端运行：</p>
+        <div style="background:#f5f5f5;border-radius:6px;padding:8px 12px;margin-top:6px;font-family:monospace;font-size:12px;color:#333;word-break:break-all;">
+          node /Users/maxine/Desktop/catpaw/import-schedule.js
+        </div>
+        <p style="margin-top:10px;color:#aaa;font-size:12px;">导入时会自动跳过已存在的同名任务，不会重复添加。</p>
+      </div>
+      <div style="margin-top:16px;text-align:right;">
+        <button onclick="closeImportHint()" style="padding:6px 16px;border-radius:5px;border:1px solid #e0e0e0;background:#fff;cursor:pointer;font-size:13px;">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 日历 ── -->
+<div class="calendar-wrap">
+  <div class="cal-header">
+    <button class="cal-nav" onclick="calNav(-1)">‹</button>
+    <span class="cal-month-title" id="calMonthTitle"></span>
+    <button class="cal-nav" onclick="calNav(1)">›</button>
+    <button class="cal-today-btn" onclick="jumpToToday()">今天</button>
+    <div class="cal-view-toggle">
+      <button class="cal-view-btn active" id="btnWeek" onclick="setCalView('week')">周</button>
+      <button class="cal-view-btn" id="btnMonth" onclick="setCalView('month')">月</button>
+    </div>
+  </div>
+  <div class="cal-week-grid" id="calWeekGrid"></div>
+  <div class="cal-month-grid" id="calMonthGrid"></div>
+</div>
+
+<!-- ── 主体：周计划表格 ── -->
+<div class="main">
+  <!-- 周标题 + 导航 -->
+  <div class="week-title-bar">
+    <button class="week-nav-btn" onclick="weekNav(-1)">‹</button>
+    <span class="week-range-title" id="weekRangeTitle"></span>
+    <button class="week-nav-btn" onclick="weekNav(1)">›</button>
+  </div>
+
+  <!-- 表格 -->
+  <div class="week-table-wrap">
+    <table class="week-table" id="weekTable">
+      <thead id="weekTableHead"></thead>
+      <tbody id="weekTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="save-toast" id="saveToast">✅ 已保存</div>
+<div class="jump-bar" id="jumpBar"></div>
+
+<script>
+/* ════════════════════════════════════════════
+   日期工具
+════════════════════════════════════════════ */
+const WD_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const WD_CN    = ['周日','周一','周二','周三','周四','周五','周六'];
+
+function todayDate() { return new Date(); }
+
+function sameDay(a, b) {
+  return a.getFullYear() === b.getFullYear()
+      && a.getMonth()    === b.getMonth()
+      && a.getDate()     === b.getDate();
+}
+
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function parseKey(k) {
+  const [y,m,d] = k.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+
+function getMonday(d) {
+  const dt = new Date(d);
+  const day = dt.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  dt.setDate(dt.getDate() + diff);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+
+function addDays(d, n) {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+function formatDate(d) {
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+}
+
+function fmtMD(d) {
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+
+/* ════════════════════════════════════════════
+   数据结构
+   planData: { [dateKey]: { am: Task[], pm: Task[] } }
+   Task: { id, text, done, doneAt, highlight }
+════════════════════════════════════════════ */
+let planData = {};
+let selectedDate = new Date();   // 当前选中日期（决定显示哪一周）
+let calView = 'week';
+let calBaseDate = new Date();
+let allCollapsed = false;
+let jumpBarTimer = null;
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+
+function getDay(d) {
+  const k = dateKey(d);
+  if (!planData[k]) planData[k] = { am: [], pm: [] };
+  return planData[k];
+}
+
+/* ════════════════════════════════════════════
+   默认示例数据（上周，固定偏移避免漂移）
+════════════════════════════════════════════ */
+function buildDefaultData() {
+  const lastMonday = getMonday(addDays(new Date(), -7));
+
+  const mon = dateKey(lastMonday);
+  planData[mon] = {
+    am: [
+      { id: genId(), text: '关闭解锁机柜封宝', done: true,  doneAt: '09:30', highlight: false },
+      { id: genId(), text: '宣发用哪个公众号',  done: true,  doneAt: '10:15', highlight: false },
+      { id: genId(), text: '催办2月客服丢宝',   done: true,  doneAt: '11:00', highlight: false },
+      { id: genId(), text: '3月的找回升高排查', done: true,  doneAt: '11:30', highlight: false },
+    ],
+    pm: [
+      { id: genId(), text: '1013任务管理审批-璐姐',                     done: true, doneAt: '14:20', highlight: false },
+      { id: genId(), text: '过 高风险仓位运维分析',                      done: true, doneAt: '15:30', highlight: true  },
+      { id: genId(), text: '跟逸文确认 实时丢宝找回信息表优化说明 进度', done: true, doneAt: '16:00', highlight: true  },
+      { id: genId(), text: '丢宝活跃准确性的需求整理',                   done: true, doneAt: '17:00', highlight: false },
+    ]
+  };
+
+  const tue = dateKey(addDays(lastMonday, 1));
+  planData[tue] = {
+    am: [
+      { id: genId(), text: '张艺的金额sql',   done: true, doneAt: '10:00', highlight: false },
+      { id: genId(), text: '施发黑名单的需求', done: true, doneAt: '11:00', highlight: false },
+    ],
+    pm: [
+      { id: genId(), text: '拉运营和售后过丢宝 丢宝/封禁/合作商通知等规则汇总', done: true, doneAt: '14:30', highlight: true  },
+      { id: genId(), text: '全作调研返修全仓封禁情况',                           done: true, doneAt: '15:00', highlight: false },
+      { id: genId(), text: '逸文丢宝宽表修复问题',                               done: true, doneAt: '15:30', highlight: false },
+      { id: genId(), text: '新国标增加其他内容展示',                             done: true, doneAt: '16:00', highlight: false },
+      { id: genId(), text: 'KA健康运维后线工具KA',                               done: true, doneAt: '17:00', highlight: false },
+    ]
+  };
+
+  const wed = dateKey(addDays(lastMonday, 2));
+  planData[wed] = {
+    am: [
+      { id: genId(), text: '与涵翼对齐存量反向机柜影响',                              done: true, doneAt: '09:30', highlight: false },
+      { id: genId(), text: '实时机柜过渡赋能维修和返修的可行性-孟祥站',               done: true, doneAt: '10:30', highlight: false },
+      { id: genId(), text: '准备出海提需求，同时问一下远哥出海希望我们做物处理的背景', done: true, doneAt: '11:00', highlight: false },
+      { id: genId(), text: '新国际工厂排查情况',                                      done: true, doneAt: '11:30', highlight: false },
+    ],
+    pm: [
+      { id: genId(), text: '对齐丢宝case',     done: true, doneAt: '14:00', highlight: false },
+      { id: genId(), text: '对齐离转升org问题', done: true, doneAt: '15:00', highlight: false },
+      { id: genId(), text: '上出海过需求评审会',done: true, doneAt: '16:00', highlight: false },
+    ]
+  };
+
+  const thu = dateKey(addDays(lastMonday, 3));
+  planData[thu] = {
+    am: [
+      { id: genId(), text: '周会', done: true, doneAt: '10:00', highlight: false },
+    ],
+    pm: [
+      { id: genId(), text: '关闭解锁机柜封宝',            done: true, doneAt: '14:00', highlight: false },
+      { id: genId(), text: '【3】出海健康检测页prd 评审', done: true, doneAt: '15:30', highlight: true  },
+    ]
+  };
+
+  const fri = dateKey(addDays(lastMonday, 4));
+  planData[fri] = { am: [], pm: [] };
+}
+
+/* ════════════════════════════════════════════
+   日历渲染
+════════════════════════════════════════════ */
+function renderCalendar() {
+  if (calView === 'week') renderWeekCal();
+  else renderMonthCal();
+}
+
+function renderWeekCal() {
+  document.getElementById('calWeekGrid').style.display = 'grid';
+  document.getElementById('calMonthGrid').classList.remove('show');
+
+  const monday = getMonday(calBaseDate);
+  const todayD = todayDate();
+  const endSun = addDays(monday, 6);
+  const sm = monday.getMonth()+1, em = endSun.getMonth()+1;
+  document.getElementById('calMonthTitle').textContent =
+    sm === em ? `${monday.getFullYear()}年 ${sm}月` : `${monday.getFullYear()}年 ${sm}月 - ${em}月`;
+
+  const grid = document.getElementById('calWeekGrid');
+  grid.innerHTML = '';
+
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(monday, i);
+    const isToday    = sameDay(d, todayD);
+    const isSelected = sameDay(d, selectedDate);
+    const isWeekend  = d.getDay() === 0 || d.getDay() === 6;
+    const dayInfo    = getDayStats(d);
+
+    const col = document.createElement('div');
+    col.className = 'cal-day-col'
+      + (isToday    ? ' is-today'    : '')
+      + (isSelected ? ' is-selected' : '')
+      + (isWeekend  ? ' is-weekend'  : '');
+
+    col.innerHTML = `
+      <div class="cal-wd-label">${WD_SHORT[d.getDay()]}</div>
+      <div class="cal-date-num">${d.getDate()}</div>
+      <div class="cal-task-dots">
+        ${dayInfo.pending > 0 ? `<div class="cal-dot pending"></div>` : ''}
+        ${dayInfo.done    > 0 ? `<div class="cal-dot done"></div>`    : ''}
+      </div>`;
+
+    col.onclick = () => selectDate(d);
+    grid.appendChild(col);
+  }
+}
+
+function renderMonthCal() {
+  document.getElementById('calWeekGrid').style.display = 'none';
+  const mg = document.getElementById('calMonthGrid');
+  mg.classList.add('show');
+
+  const yr  = calBaseDate.getFullYear();
+  const mon = calBaseDate.getMonth();
+  const todayD = todayDate();
+
+  document.getElementById('calMonthTitle').textContent = `${yr}年 ${mon+1}月`;
+  mg.innerHTML = '';
+
+  ['日','一','二','三','四','五','六'].forEach(w => {
+    const h = document.createElement('div');
+    h.className = 'cal-mth-wd';
+    h.textContent = w;
+    mg.appendChild(h);
+  });
+
+  const firstDay = new Date(yr, mon, 1).getDay();
+  const daysInMonth = new Date(yr, mon+1, 0).getDate();
+
+  const addCell = (d, other) => {
+    const isToday    = sameDay(d, todayD);
+    const isSelected = sameDay(d, selectedDate);
+    const isWeekend  = d.getDay() === 0 || d.getDay() === 6;
+    const dayInfo    = getDayStats(d);
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-mth-cell'
+      + (isToday    ? ' is-today'      : '')
+      + (isSelected ? ' is-selected'   : '')
+      + (other      ? ' is-other-month': '')
+      + (isWeekend  ? ' is-weekend'    : '');
+
+    cell.innerHTML = `
+      <div class="cal-mth-num">${d.getDate()}</div>
+      <div class="cal-task-dots">
+        ${dayInfo.pending > 0 ? `<div class="cal-dot pending" style="width:3px;height:3px"></div>` : ''}
+        ${dayInfo.done    > 0 ? `<div class="cal-dot done"    style="width:3px;height:3px"></div>` : ''}
+      </div>`;
+
+    cell.onclick = () => selectDate(d);
+    mg.appendChild(cell);
+  };
+
+  for (let i = 0; i < firstDay; i++) addCell(new Date(yr, mon, 1-(firstDay-i)), true);
+  for (let i = 1; i <= daysInMonth; i++) addCell(new Date(yr, mon, i), false);
+  const total = firstDay + daysInMonth;
+  const remain = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i = 1; i <= remain; i++) addCell(new Date(yr, mon+1, i), true);
+}
+
+function getDayStats(d) {
+  const k = dateKey(d);
+  const day = planData[k];
+  if (!day) return { pending: 0, done: 0 };
+  const all = [...(day.am||[]), ...(day.pm||[])];
+  return {
+    pending: all.filter(t => !t.done).length,
+    done:    all.filter(t =>  t.done).length,
+  };
+}
+
+function calNav(dir) {
+  if (calView === 'week') calBaseDate = addDays(calBaseDate, dir * 7);
+  else { calBaseDate = new Date(calBaseDate); calBaseDate.setMonth(calBaseDate.getMonth() + dir); }
+  renderCalendar();
+}
+
+function setCalView(v) {
+  calView = v;
+  document.getElementById('btnWeek').classList.toggle('active', v === 'week');
+  document.getElementById('btnMonth').classList.toggle('active', v === 'month');
+  renderCalendar();
+}
+
+/* ════════════════════════════════════════════
+   周表格渲染
+════════════════════════════════════════════ */
+function getWeekDays() {
+  // 返回当前选中日期所在周的周一到周五（5天）
+  const monday = getMonday(selectedDate);
+  const days = [];
+  for (let i = 0; i < 5; i++) days.push(addDays(monday, i));
+  return days;
+}
+
+function renderWeekTable() {
+  const days = getWeekDays();
+  const todayD = todayDate();
+  const monday = days[0];
+  const friday = days[4];
+
+  // 更新周标题
+  document.getElementById('weekRangeTitle').textContent =
+    `工作计划 ${monday.getMonth()+1}.${monday.getDate()}-${friday.getMonth()+1}.${friday.getDate()}`;
+
+  // 渲染表头
+  const thead = document.getElementById('weekTableHead');
+  thead.innerHTML = '';
+  const headRow = document.createElement('tr');
+
+  // 序号列
+  const thSeq = document.createElement('th');
+  thSeq.className = 'col-seq';
+  thSeq.textContent = '序号';
+  headRow.appendChild(thSeq);
+
+  // 时间列
+  const thTime = document.createElement('th');
+  thTime.className = 'col-time';
+  thTime.textContent = '时间';
+  headRow.appendChild(thTime);
+
+  // 日期列（周一到周五）
+  days.forEach(d => {
+    const isToday   = sameDay(d, todayD);
+    const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+    const th = document.createElement('th');
+    th.className = (isToday ? ' is-today-col' : '') + (isWeekend ? ' is-weekend-col' : '');
+    th.innerHTML = `
+      <div class="th-date">
+        <div class="th-wd">${WD_CN[d.getDay()]}</div>
+        <div class="th-day${isToday ? ' is-today' : ''}${isWeekend ? ' is-weekend' : ''}">${d.getMonth()+1}/${d.getDate()}</div>
+      </div>`;
+    headRow.appendChild(th);
+  });
+  thead.appendChild(headRow);
+
+  // 渲染表体（上午行 + 下午行）
+  const tbody = document.getElementById('weekTableBody');
+  tbody.innerHTML = '';
+
+  ['am', 'pm'].forEach((slot, rowIdx) => {
+    const tr = document.createElement('tr');
+
+    // 序号
+    const tdSeq = document.createElement('td');
+    tdSeq.className = 'td-seq col-seq';
+    tdSeq.textContent = rowIdx + 1;
+    tr.appendChild(tdSeq);
+
+    // 时间
+    const tdTime = document.createElement('td');
+    tdTime.className = 'td-time col-time';
+    tdTime.innerHTML = `<span class="slot-icon">${slot === 'am' ? '🌤' : '🌆'}</span>${slot === 'am' ? '上午' : '下午'}`;
+    tr.appendChild(tdTime);
+
+    // 每天的任务单元格
+    days.forEach(d => {
+      const isToday   = sameDay(d, todayD);
+      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+      const td = document.createElement('td');
+      td.className = 'td-tasks'
+        + (isToday   ? ' is-today-col'   : '')
+        + (isWeekend ? ' is-weekend-col' : '');
+
+      renderTasksInCell(td, d, slot);
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+function renderTasksInCell(td, d, slot) {
+  const k = dateKey(d);
+  if (!planData[k]) planData[k] = { am: [], pm: [] };
+  const tasks = planData[k][slot] || [];
+
+  const pending = tasks.filter(t => !t.done);
+  const done    = tasks.filter(t =>  t.done);
+
+  td.innerHTML = '';
+
+  // 待完成任务
+  pending.forEach(task => {
+    td.appendChild(makeTaskEl(task, k, slot));
+  });
+
+  // 已完成任务
+  if (done.length > 0) {
+    const divider = document.createElement('div');
+    divider.className = 'done-divider';
+    divider.textContent = `已完成 ${done.length} 项`;
+    td.appendChild(divider);
+    done.forEach(task => {
+      td.appendChild(makeTaskEl(task, k, slot));
+    });
+  }
+
+  // 添加任务按钮
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-task-btn';
+  addBtn.innerHTML = '＋ 添加任务';
+  addBtn.onclick = () => addTask(k, slot);
+  td.appendChild(addBtn);
+}
+
+function makeTaskEl(task, dateK, slot) {
+  const li = document.createElement('div');
+  li.className = 'task-item' + (task.done ? ' is-done' : '');
+  li.id = `task-${task.id}`;
+
+  li.innerHTML = `
+    <input type="checkbox" class="task-cb" ${task.done ? 'checked' : ''}
+      onchange="toggleTask('${dateK}','${slot}','${task.id}',this.checked)" />
+    <div class="task-text-wrap">
+      <textarea class="task-text${task.highlight ? ' hl' : ''}" rows="1"
+        onblur="updateText('${dateK}','${slot}','${task.id}',this.value)"
+        oninput="autoResize(this)"
+        ${task.done ? 'readonly' : ''}
+      >${escHtml(task.text)}</textarea>
+      <div class="task-done-time">${task.doneAt ? '✓ ' + task.doneAt + ' 完成' : ''}</div>
+    </div>
+    <div class="task-ops">
+      <button class="task-op-btn" title="高亮" onclick="toggleHL('${dateK}','${slot}','${task.id}')">🔵</button>
+      <button class="task-op-btn del" title="删除" onclick="deleteTask('${dateK}','${slot}','${task.id}')">✕</button>
+    </div>`;
+
+  return li;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+/* ════════════════════════════════════════════
+   任务操作
+════════════════════════════════════════════ */
+function findTask(dateK, slot, id) {
+  return (planData[dateK]?.[slot] || []).find(t => t.id === id);
+}
+
+function toggleTask(dateK, slot, id, checked) {
+  const task = findTask(dateK, slot, id);
+  if (!task) return;
+  task.done = checked;
+  if (checked) {
+    const now = new Date();
+    task.doneAt = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  } else {
+    task.doneAt = '';
+  }
+  renderAll();
+  autoSave();
+}
+
+function updateText(dateK, slot, id, value) {
+  const task = findTask(dateK, slot, id);
+  if (task) { task.text = value.trim(); autoSave(); }
+}
+
+function toggleHL(dateK, slot, id) {
+  const task = findTask(dateK, slot, id);
+  if (task) { task.highlight = !task.highlight; renderAll(); autoSave(); }
+}
+
+function deleteTask(dateK, slot, id) {
+  if (!planData[dateK]) return;
+  planData[dateK][slot] = planData[dateK][slot].filter(t => t.id !== id);
+  renderAll();
+  autoSave();
+}
+
+function addTask(dateK, slot) {
+  if (!planData[dateK]) planData[dateK] = { am: [], pm: [] };
+  const newTask = { id: genId(), text: '', done: false, doneAt: '', highlight: false };
+  planData[dateK][slot].push(newTask);
+  renderAll();
+  autoSave();
+  setTimeout(() => {
+    const el = document.querySelector(`#task-${newTask.id} .task-text`);
+    if (el) { el.focus(); autoResize(el); }
+  }, 60);
+}
+
+// 顶部按钮：给本周所有工作日添加一个空任务
+function addTaskSlot(slot) {
+  const days = getWeekDays();
+  const todayD = todayDate();
+  // 优先给今天添加，否则给周一添加
+  let targetDay = days.find(d => sameDay(d, todayD)) || days[0];
+  addTask(dateKey(targetDay), slot);
+}
+
+function clearDone() {
+  Object.keys(planData).forEach(k => {
+    ['am','pm'].forEach(slot => {
+      if (planData[k][slot]) planData[k][slot] = planData[k][slot].filter(t => !t.done);
+    });
+  });
+  renderAll();
+  autoSave();
+}
+
+function toggleAllGroups() {
+  // 在周表格模式下，展开/收起已完成分隔线以下的内容
+  allCollapsed = !allCollapsed;
+  document.querySelectorAll('.done-divider').forEach(el => {
+    let next = el.nextElementSibling;
+    while (next && !next.classList.contains('add-task-btn')) {
+      next.style.display = allCollapsed ? 'none' : '';
+      next = next.nextElementSibling;
+    }
+    el.style.display = allCollapsed ? 'none' : '';
+  });
+}
+
+/* ════════════════════════════════════════════
+   周导航
+════════════════════════════════════════════ */
+function weekNav(dir) {
+  selectedDate = addDays(selectedDate, dir * 7);
+  calBaseDate  = new Date(selectedDate);
+  renderAll();
+  showJumpBar(`📅 ${getWeekDays()[0].getMonth()+1}月${getWeekDays()[0].getDate()}日 - ${getWeekDays()[4].getMonth()+1}月${getWeekDays()[4].getDate()}日`);
+}
+
+/* ════════════════════════════════════════════
+   选中日期 & 全量渲染
+════════════════════════════════════════════ */
+function selectDate(d) {
+  selectedDate = new Date(d);
+  calBaseDate  = new Date(d);
+  renderAll();
+  const days = getWeekDays();
+  showJumpBar(`📅 跳转到 ${days[0].getMonth()+1}月${days[0].getDate()}日 - ${days[4].getMonth()+1}月${days[4].getDate()}日`);
+}
+
+function jumpToToday() {
+  selectDate(todayDate());
+}
+
+function renderAll() {
+  renderCalendar();
+  renderWeekTable();
+  updateGlobalStats();
+  setTimeout(() => {
+    document.querySelectorAll('.task-text').forEach(autoResize);
+  }, 30);
+}
+
+/* ════════════════════════════════════════════
+   全局统计
+════════════════════════════════════════════ */
+function updateGlobalStats() {
+  let done = 0, total = 0;
+  Object.values(planData).forEach(day => {
+    [...(day.am||[]), ...(day.pm||[])].forEach(t => {
+      total++;
+      if (t.done) done++;
+    });
+  });
+  document.getElementById('statBadge').textContent = `${done} / ${total} 已完成`;
+
+  const todayD = todayDate();
+  document.getElementById('todayLabel').textContent =
+    `📍 今天 ${todayD.getMonth()+1}月${todayD.getDate()}日 ${WD_CN[todayD.getDay()]}`;
+}
+
+/* ════════════════════════════════════════════
+   跳转提示条
+════════════════════════════════════════════ */
+function showJumpBar(msg) {
+  const el = document.getElementById('jumpBar');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (jumpBarTimer) clearTimeout(jumpBarTimer);
+  jumpBarTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+/* ════════════════════════════════════════════
+   保存 / 导出
+════════════════════════════════════════════ */
+function autoSave() {
+  try {
+    const title = document.getElementById('planTitle').value;
+    localStorage.setItem('workPlan_v2', JSON.stringify({ title, data: planData }));
+  } catch(e) {}
+}
+
+function savePlan() {
+  autoSave();
+  const now = new Date();
+  document.getElementById('lastSaved').textContent =
+    `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')} 已保存`;
+  const toast = document.getElementById('saveToast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function exportPlan() {
+  const title = document.getElementById('planTitle').value;
+  let text = `${title}\n${'='.repeat(40)}\n\n`;
+  const keys = Object.keys(planData).sort();
+  keys.forEach(k => {
+    const d = parseKey(k);
+    const day = planData[k];
+    const allTasks = [...(day.am||[]), ...(day.pm||[])];
+    if (allTasks.length === 0) return;
+    text += `【${formatDate(d)} ${WD_CN[d.getDay()]}】\n`;
+    if (day.am?.length > 0) {
+      text += `  上午:\n`;
+      day.am.forEach(t => { text += `    [${t.done?'✓':' '}] ${t.text}${t.done && t.doneAt ? ' ('+t.doneAt+')' : ''}\n`; });
+    }
+    if (day.pm?.length > 0) {
+      text += `  下午:\n`;
+      day.pm.forEach(t => { text += `    [${t.done?'✓':' '}] ${t.text}${t.done && t.doneAt ? ' ('+t.doneAt+')' : ''}\n`; });
+    }
+    text += '\n';
+  });
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${title}.txt`;
+  a.click();
+}
+
+/* ════════════════════════════════════════════
+   导入说明弹窗
+════════════════════════════════════════════ */
+function showImportHint() {
+  const modal = document.getElementById('importHintModal');
+  modal.style.display = 'flex';
+}
+function closeImportHint() {
+  document.getElementById('importHintModal').style.display = 'none';
+}
+// 点击遮罩关闭
+document.addEventListener('click', e => {
+  const modal = document.getElementById('importHintModal');
+  if (e.target === modal) modal.style.display = 'none';
+});
+
+/* ════════════════════════════════════════════
+   初始化
+════════════════════════════════════════════ */
+function init() {
+  try {
+    const saved = localStorage.getItem('workPlan_v2');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      planData = parsed.data || {};
+      document.getElementById('planTitle').value = parsed.title || '工作计划';
+    } else {
+      buildDefaultData();
+    }
+  } catch(e) {
+    buildDefaultData();
+  }
+
+  // 显示上次导入时间
+  try {
+    const lastImport = localStorage.getItem('workPlan_lastImport');
+    if (lastImport) {
+      document.getElementById('lastImportLabel').style.display = '';
+      document.getElementById('lastImportTime').textContent = `上次导入: ${lastImport}`;
+    }
+  } catch(e) {}
+
+  selectedDate = todayDate();
+  calBaseDate  = new Date();
+
+  renderAll();
+
+  document.getElementById('planTitle').addEventListener('input', autoSave);
+}
+
+init();
+</script>
+</body>
+</html>
