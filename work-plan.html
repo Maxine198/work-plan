@@ -726,6 +726,40 @@
 
 <script>
 /* ════════════════════════════════════════════
+   内嵌数据（由 import-schedule.js 自动注入，勿手动修改此行）
+   __INJECTED_DATA_START__
+   var __PLAN_DATA__ = {
+  "title": "工作计划",
+  "data": {
+    "2026-03-30": {
+      "am": [
+        {
+          "id": "mncuukjncbr4",
+          "text": "[11:45-14:00] 董月的日程",
+          "done": false,
+          "doneAt": "",
+          "highlight": false,
+          "fromSchedule": true
+        }
+      ],
+      "pm": [
+        {
+          "id": "mncuukjn5cis",
+          "text": "[16:00-16:50] 吸奶",
+          "done": false,
+          "doneAt": "",
+          "highlight": false,
+          "fromSchedule": true
+        }
+      ]
+    }
+  },
+  "lastImport": "3月30日 15:16"
+};
+   __INJECTED_DATA_END__
+════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════
    日期工具
 ════════════════════════════════════════════ */
 const WD_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1292,7 +1326,12 @@ function showJumpBar(msg) {
 function autoSave() {
   try {
     const title = document.getElementById('planTitle').value;
-    localStorage.setItem('workPlan_v2', JSON.stringify({ title, data: planData }));
+    const payload = { title, data: planData };
+    localStorage.setItem('workPlan_v2', JSON.stringify(payload));
+    // 同步更新内嵌变量（本地文件模式下保持一致）
+    if (typeof __PLAN_DATA__ !== 'undefined') {
+      window.__PLAN_DATA__ = payload;
+    }
   } catch(e) {}
 }
 
@@ -1354,13 +1393,20 @@ document.addEventListener('click', e => {
 ════════════════════════════════════════════ */
 function init() {
   try {
-    const saved = localStorage.getItem('workPlan_v2');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      planData = parsed.data || {};
-      document.getElementById('planTitle').value = parsed.title || '工作计划';
+    // 优先使用脚本注入的内嵌数据（本地文件模式）
+    if (typeof __PLAN_DATA__ !== 'undefined' && __PLAN_DATA__ !== null) {
+      planData = __PLAN_DATA__.data || {};
+      document.getElementById('planTitle').value = __PLAN_DATA__.title || '工作计划';
     } else {
-      buildDefaultData();
+      // 其次读取 localStorage（在线模式）
+      const saved = localStorage.getItem('workPlan_v2');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        planData = parsed.data || {};
+        document.getElementById('planTitle').value = parsed.title || '工作计划';
+      } else {
+        buildDefaultData();
+      }
     }
   } catch(e) {
     buildDefaultData();
